@@ -1,0 +1,187 @@
+### **governance-policy-schemas/schemas/v1.0.0/policy.schema.json**
+```json
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://governance.example.com/schemas/v1.0.0/policy.schema.json",
+  "title": "Governance Policy",
+  "description": "Schema for governance policies",
+  "type": "object",
+  "required": ["apiVersion", "kind", "metadata", "spec"],
+  "properties": {
+    "apiVersion": {
+      "type": "string",
+      "pattern": "^governance/v[0-9]+\\.[0-9]+\\.[0-9]+$",
+      "description": "API version of the policy"
+    },
+    "kind": {
+      "type": "string",
+      "const": "Policy",
+      "description": "Resource kind"
+    },
+    "metadata": {
+      "$ref": "#/definitions/Metadata"
+    },
+    "spec": {
+      "$ref": "#/definitions/Spec"
+    }
+  },
+  "definitions": {
+    "Metadata": {
+      "type": "object",
+      "required": ["name", "version"],
+      "properties": {
+        "name": {
+          "type": "string",
+          "pattern": "^[a-z0-9-]+$",
+          "maxLength": 63,
+          "description": "Unique name of the policy"
+        },
+        "version": {
+          "type": "string",
+          "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$",
+          "description": "Semantic version of the policy"
+        },
+        "description": {
+          "type": "string",
+          "maxLength": 1000,
+          "description": "Human-readable description"
+        },
+        "labels": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "annotations": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "Spec": {
+      "type": "object",
+      "required": ["target", "rules"],
+      "properties": {
+        "target": {
+          "$ref": "#/definitions/Target"
+        },
+        "rules": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Rule"
+          },
+          "minItems": 1
+        },
+        "parameters": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/definitions/Parameter"
+          }
+        }
+      }
+    },
+    "Target": {
+      "type": "object",
+      "required": ["resourceType"],
+      "properties": {
+        "resourceType": {
+          "type": "string",
+          "description": "Type of resource this policy applies to"
+        },
+        "resourceGroup": {
+          "type": "string",
+          "description": "Optional resource group filter"
+        },
+        "conditions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Condition"
+          }
+        }
+      }
+    },
+    "Rule": {
+      "type": "object",
+      "required": ["name", "condition"],
+      "properties": {
+        "name": {
+          "type": "string",
+          "pattern": "^[a-zA-Z0-9-_]+$"
+        },
+        "description": {
+          "type": "string"
+        },
+        "condition": {
+          "type": "string",
+          "description": "JSONPath expression to evaluate"
+        },
+        "message": {
+          "type": "string",
+          "description": "Message to display when rule fails"
+        },
+        "severity": {
+          "type": "string",
+          "enum": ["low", "medium", "high", "critical"]
+        },
+        "remediation": {
+          "$ref": "#/definitions/Remediation"
+        }
+      }
+    },
+    "Condition": {
+      "type": "object",
+      "required": ["type", "value"],
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": ["tag", "property", "resource"]
+        },
+        "key": {
+          "type": "string"
+        },
+        "operator": {
+          "type": "string",
+          "enum": ["equals", "notEquals", "contains", "exists"]
+        },
+        "value": {
+          "type": ["string", "number", "boolean", "array"]
+        }
+      }
+    },
+    "Parameter": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": ["string", "number", "boolean", "array"]
+        },
+        "default": {
+          "type": ["string", "number", "boolean", "array"]
+        },
+        "description": {
+          "type": "string"
+        },
+        "required": {
+          "type": "boolean"
+        }
+      }
+    },
+    "Remediation": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": ["manual", "automatic", "terraform", "cloudformation"]
+        },
+        "instructions": {
+          "type": "string"
+        },
+        "template": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}
