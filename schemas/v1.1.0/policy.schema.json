@@ -1,0 +1,84 @@
+governance-policy-schemas/schemas/v1.1.0/policy.schema.json
+
+```json
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://governance.example.com/schemas/v1.1.0/policy.schema.json",
+  "title": "Governance Policy v1.1.0",
+  "description": "Enhanced schema with new features",
+  "type": "object",
+  "required": ["apiVersion", "kind", "metadata", "spec"],
+  "properties": {
+    "apiVersion": {
+      "type": "string",
+      "pattern": "^governance/v[0-9]+\\.[0-9]+\\.[0-9]+$"
+    },
+    "kind": {
+      "type": "string",
+      "enum": ["Policy", "PolicySet"]
+    },
+    "metadata": {
+      "$ref": "#/definitions/Metadata"
+    },
+    "spec": {
+      "$ref": "#/definitions/Spec"
+    },
+    "enforcement": {
+      "type": "string",
+      "enum": ["enforce", "audit", "dry-run"],
+      "default": "audit"
+    }
+  },
+  "definitions": {
+    "Metadata": {
+      "type": "object",
+      "required": ["name", "version"],
+      "properties": {
+        "name": {
+          "type": "string",
+          "pattern": "^[a-z0-9-]+$"
+        },
+        "version": {
+          "type": "string",
+          "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"
+        },
+        "description": {
+          "type": "string"
+        },
+        "tags": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "compliance": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "Spec": {
+      "type": "object",
+      "required": ["target", "rules"],
+      "properties": {
+        "target": {
+          "$ref": "#/definitions/Target"
+        },
+        "rules": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Rule"
+          }
+        },
+        "exceptions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Exception"
+          }
+        }
+      }
+    }
+  }
+}
